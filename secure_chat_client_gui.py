@@ -71,7 +71,10 @@ def handle_response():
         # Decrypt the ciphertext and print the plaintext
         plaintext = decrypt_message(ciphertext_with_iv)
         print(f"Received message from server: {plaintext}")
+
         messagebox.showinfo("Message from Server", f"{plaintext}")
+
+        generate_secret_key(SECRET_KEY.decode('latin-1'))
 
 # Connect to the server and start a new thread to handle server responses
 def connect_to_server():

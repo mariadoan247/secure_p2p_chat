@@ -93,6 +93,8 @@ def handle_client(client_socket):
         response_message = input("Enter response: ")
         response_ciphertext = encrypt_message(response_message)
         client_socket.send(response_ciphertext)
+
+        generate_secret_key(SECRET_KEY.decode('latin-1'))
     
     # Close the client socket
     client_socket.close()
