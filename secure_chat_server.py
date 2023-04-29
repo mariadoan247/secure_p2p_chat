@@ -68,7 +68,7 @@ def handle_client(client_socket):
     print(f"Received password from client: {password}")
     
     # Generate the secret key from the password
-    generate_secret_key(password)
+    generate_secret_key(PASSWORD)
     
     # Generate the initialization vector for AES encryption
     generate_iv()
@@ -78,13 +78,12 @@ def handle_client(client_socket):
         ciphertext = client_socket.recv(1024)
         if not ciphertext:
             break
-        
         # Decrypt the ciphertext and print the plaintext
         plaintext = decrypt_message(ciphertext)
         print(f"Received message from client: {plaintext}")
         
         # Encrypt a response message and send it to the client
-        response_message = f"Received message: {plaintext}"
+        response_message = input("Enter response: ")
         response_ciphertext = encrypt_message(response_message)
         client_socket.send(response_ciphertext)
     
