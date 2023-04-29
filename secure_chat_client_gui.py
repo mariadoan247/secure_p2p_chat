@@ -33,23 +33,30 @@ def generate_secret_key(password):
     global SECRET_KEY
     key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), SALT, ITERATION_COUNT)
     SECRET_KEY = key[:16]
+    print("THIS IS THE SECRET KEY: ", SECRET_KEY)
 
 # Generate the initialization vector for AES encryption
 def generate_iv():
     global IV
     IV = os.urandom(BLOCK_SIZE)
+    print("THIS IS THE IV: ", IV)
 
 # Encrypt the message using AES encryption
 def encrypt_message(message):
     cipher = AES.new(SECRET_KEY, AES.MODE_CBC, IV)
     padded_message = message + (BLOCK_SIZE - len(message) % BLOCK_SIZE) * chr(BLOCK_SIZE - len(message) % BLOCK_SIZE)
-    ciphertext = cipher.encrypt(padded_message.encode('latin-1'))
-    return ciphertext
+    ciphertext = cipher.encrypt(padded_message.encode('utf-8'))
+    print("THIS IS THE CIPHERTEXT: ", ciphertext)
+    return IV + ciphertext
 
 # Decrypt the message using AES encryption
-def decrypt_message(ciphertext):
-    cipher = AES.new(SECRET_KEY, AES.MODE_CBC, IV)
-    plaintext = cipher.decrypt(ciphertext).decode('latin-1').rstrip(chr(ciphertext[-1]))
+def decrypt_message(ciphertext_with_iv):
+    iv = ciphertext_with_iv[:BLOCK_SIZE]
+    ciphertext = ciphertext_with_iv[BLOCK_SIZE:]
+    cipher = AES.new(SECRET_KEY, AES.MODE_CBC, iv)
+    padded_plaintext = cipher.decrypt(ciphertext)
+    plaintext = padded_plaintext[:-padded_plaintext[-1]].decode('latin-1')
+    print("THIS IS THE PLAINTEXT: ", plaintext)
     return plaintext
 
 # Handle server responses
@@ -57,12 +64,12 @@ def handle_response():
     global client_socket
     while True:
         # Receive the ciphertext from the server
-        ciphertext = client_socket.recv(1024)
-        if not ciphertext:
+        ciphertext_with_iv = client_socket.recv(1024)
+        if not ciphertext_with_iv:
             break
         
         # Decrypt the ciphertext and print the plaintext
-        plaintext = decrypt_message(ciphertext)
+        plaintext = decrypt_message(ciphertext_with_iv)
         print(f"Received message from server: {plaintext}")
         messagebox.showinfo("Message from Server", f"{plaintext}")
 
