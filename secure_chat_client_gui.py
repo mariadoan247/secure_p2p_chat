@@ -10,9 +10,6 @@ from tkinter import messagebox
 SERVER_IP = '127.0.0.1'
 SERVER_PORT = 5000
 
-# Define the password for key generation
-PASSWORD = 'mysecretpassword'
-
 # Define the block size for AES encryption
 BLOCK_SIZE = 16
 
